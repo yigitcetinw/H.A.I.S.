@@ -8,6 +8,8 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.NonNull;
+
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -99,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
             client.newCall(request).enqueue(new Callback() {
     @Override
-    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+    public void onFailure(Call call, IOException e) {
         // UI güncellemelerini runOnUiThread içine alıyoruz
         runOnUiThread(new Runnable() {
             @Override
@@ -110,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+    public void onResponse(Call call, Response response) throws IOException {
         if (response.isSuccessful()) {
             final String responseData = response.body().string();
 
