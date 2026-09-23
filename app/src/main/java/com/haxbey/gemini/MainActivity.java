@@ -98,38 +98,35 @@ public class MainActivity extends AppCompatActivity {
                     .build();
 
             client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    runOnUiThread(() -> {
-                        progressBar.setVisibility(View.GONE);
-                        addAiMessage("Bağlantı hatası oluştu: " + e.getMessage());
-                    });
-                }
+    @Override
+    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+        // UI güncellemelerini runOnUiThread içine alıyoruz
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Hata durumunda UI güncellemeleri (örneğin ProgressBar gizleme)
+            }
+        });
+    }
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    progressBar.setVisibility(View.GONE);
-                    if (response.isSuccessful() && response.body() != null) {
-                        try {
-                            String responseData = response.body().string();
-                            JSONObject jsonResponse = new JSONObject(responseData);
-                            String reply = jsonResponse
-                                    .getJSONArray("candidates")
-                                    .getJSONObject(0)
-                                    .getJSONObject("content")
-                                    .getJSONArray("parts")
-                                    .getJSONObject(0)
-                                    .getString("text");
+    @Override
+    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+        if (response.isSuccessful()) {
+            final String responseData = response.body().string();
 
-                            runOnUiThread(() -> addAiMessage(reply));
-                        } catch (Exception e) {
-                            runOnUiThread(() -> addAiMessage("Yanıt ayrıştırılamadı."));
-                        }
-                    } else {
-                        runOnUiThread(() -> addAiMessage("API Hatası: " + response.code()));
-                    }
+            // UI güncellemesini MAIN THREAD'e gönderiyoruz
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // 111. satırda crash atan UI kodların buraya gelecek:
+                    // Örn: textView.setText(responseData);
+                    // Örn: progressBar.setVisibility(View.GONE);
                 }
             });
+        }
+    }
+});
+
 
         } catch (Exception e) {
             progressBar.setVisibility(View.GONE);
